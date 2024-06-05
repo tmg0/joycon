@@ -1,9 +1,9 @@
 mod commands;
+mod common;
 mod hosts;
-mod utils;
 
 #[tokio::main]
 async fn main() {
-    let config = utils::resolve_config().await;
+    let config = common::config::resolve_config().await;
     println!("{}", config.hosts);
 }
