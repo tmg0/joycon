@@ -1,9 +1,10 @@
-mod commands;
 mod common;
+mod core;
 mod hosts;
 
 #[tokio::main]
 async fn main() {
-    let config = common::config::resolve_config().await;
-    println!("{}", config.hosts);
+    let options = core::options::resolve_options().await;
+    let context = core::context::create_context(options);
+    println!("{}", hosts::insert_joycon_hosts(context).await);
 }

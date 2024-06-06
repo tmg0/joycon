@@ -1,36 +1,15 @@
 use std::path::Path;
 use tokio::fs;
-use tokio::fs::File;
-use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
-
-pub async fn copy(from: String, to: String) -> io::Result<()> {
-    let mut source = File::open(from).await?;
-    let mut destination = File::create(to).await?;
-
-    let mut buffer = vec![0; 8192]; // 定义缓冲区大小
-    loop {
-        let n = source.read(&mut buffer).await?;
-        if n == 0 {
-            break;
-        }
-        destination.write_all(&buffer[..n]).await?;
-    }
-
-    Ok(())
-}
+use tokio::fs::read_to_string;
 
 pub async fn path_exists<T: AsRef<Path>>(path: T) -> bool {
     fs::metadata(path).await.is_ok()
 }
 
-pub async fn ensure_file<T: AsRef<Path>>(path: T) {
+pub async fn read_file<T: AsRef<Path>>(path: T) -> Result<String, ()> {
     let path = path.as_ref();
-
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).await.unwrap();
+    if path_exists(path).await {
+        return Ok(read_to_string(path).await.unwrap());
     }
-
-    if fs::metadata(path).await.is_err() {
-        File::create(path).await.unwrap();
-    }
+    Err(())
 }
