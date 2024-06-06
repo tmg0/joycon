@@ -20,3 +20,8 @@ pub async fn write_file<T: AsRef<Path>>(path: T, content: &str) {
     let mut file = File::create(path).await.unwrap();
     file.write_all(&content.as_bytes()).await.unwrap();
 }
+
+pub async fn ensure_dir<T: AsRef<Path>>(path: T) {
+    let path = path.as_ref();
+    fs::create_dir_all(path).await.unwrap();
+}

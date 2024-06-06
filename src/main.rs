@@ -1,10 +1,10 @@
 mod common;
 mod core;
-mod hosts;
 
 #[tokio::main]
 async fn main() {
     let options = core::options::resolve_options().await;
     let context = core::context::create_context(options);
-    hosts::insert_joycon_hosts(&context).await;
+    core::hosts::insert_joycon_hosts(&context).await;
+    core::kube::flush_joycon_kube_config(&context).await;
 }

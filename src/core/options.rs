@@ -1,10 +1,12 @@
 use crate::common::fse;
-use crate::hosts::get_default_hosts_filepath;
+use crate::core::hosts::get_default_hosts_filepath;
+use crate::core::kube::get_default_kube_filepath;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Options {
     pub hosts: String,
+    pub kube: String,
 }
 
 pub async fn resolve_config_filepath() -> Result<String, ()> {
@@ -18,6 +20,7 @@ pub async fn resolve_config_filepath() -> Result<String, ()> {
 pub async fn resolve_options() -> Options {
     let default_config = Options {
         hosts: get_default_hosts_filepath(),
+        kube: get_default_kube_filepath(),
     };
 
     match resolve_config_filepath().await {
