@@ -10,8 +10,8 @@ pub fn get_default_kube_filepath() -> String {
 }
 
 pub async fn resolve_joycon_kube_config() -> Result<String, ()> {
-    if fse::path_exists(".joycon/.kube/config").await {
-        let content = fse::read_file(".joycon/.kube/config").await?;
+    if fse::path_exists(".joycon/kube/config").await {
+        let content = fse::read_file(".joycon/kube/config").await?;
         if content.trim().is_empty() {
             return Err(());
         }
@@ -28,7 +28,9 @@ pub async fn flush_joycon_kube_config(ctx: &Context) {
             fse::write_file(&ctx.options.kube, &config).await;
         }
         Err(_) => {
-            fs::remove_file(&ctx.options.kube).await.unwrap();
+            if fse::path_exists(&ctx.options.kube).await {
+                fs::remove_file(&ctx.options.kube).await.unwrap();
+            }
         }
     };
 }
