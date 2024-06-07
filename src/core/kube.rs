@@ -16,10 +16,9 @@ async fn is_symlink(path: &String) -> bool {
 
 async fn has_linked(path: &String) -> bool {
     if is_symlink(path).await {
-        if fs::read_link(path).await.unwrap().to_string_lossy() == ".joycon/kube/config" {
-            return true;
-        }
-        return false;
+        let a = fs::read_link(path).await.unwrap();
+        let b = fs::canonicalize(".joycon/kube/config").await.unwrap();
+        return a == b;
     }
 
     false
@@ -27,17 +26,18 @@ async fn has_linked(path: &String) -> bool {
 
 pub async fn create_joycon_kube_config_symlink(ctx: &Context) {
     let dir = PathBuf::from(&ctx.options.kube);
+    let exists = fse::path_exists(".joycon/kube/config").await;
     fse::ensure_dir(dir.parent().unwrap()).await;
 
     if fse::path_exists(&ctx.options.kube).await {
-        if has_linked(&ctx.options.kube).await {
+        if exists && has_linked(&ctx.options.kube).await {
             return;
-        } else {
-            fs::remove_file(&ctx.options.kube).await.unwrap();
         }
+        fs::remove_file(&ctx.options.kube).await.unwrap();
     }
 
-    if fse::path_exists(".joycon/kube/config").await {
-        symlink(".joycon/kube/config", &ctx.options.kube).unwrap();
+    if exists {
+        let original = fs::canonicalize(".joycon/kube/config").await.unwrap();
+        symlink(original, &ctx.options.kube).unwrap();
     }
 }
