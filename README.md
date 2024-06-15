@@ -2,7 +2,7 @@
 
 Easy way to switch `hosts` / `kube/config` (maybe something else) by a single command.
 
-Do not provide released packages for different platforms at recent.
+Do not provide released packages for different platforms yet.
 
 ```bash
 sudo joycon
